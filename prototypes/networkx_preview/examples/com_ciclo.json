@@ -1,0 +1,19 @@
+{
+  "tarefas": [
+    {"id": "A", "nome": "Preparar ambiente"},
+    {"id": "B", "nome": "Compilar"},
+    {"id": "C", "nome": "Gerar documentação"},
+    {"id": "D", "nome": "Executar testes"},
+    {"id": "E", "nome": "Empacotar"},
+    {"id": "F", "nome": "Publicar versão"}
+  ],
+  "dependencias": [
+    {"origem": "A", "destino": "B"},
+    {"origem": "A", "destino": "C"},
+    {"origem": "B", "destino": "D"},
+    {"origem": "C", "destino": "E"},
+    {"origem": "D", "destino": "E"},
+    {"origem": "E", "destino": "F"},
+    {"origem": "E", "destino": "B"}
+  ]
+}

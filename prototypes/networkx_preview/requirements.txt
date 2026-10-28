@@ -1,0 +1,3 @@
+# Versões utilizadas na validação do protótipo. Python >= 3.9.
+networkx==3.2.1
+matplotlib==3.9.4
