@@ -1,23 +1,20 @@
-# Protótipo visual com NetworkX
+# DepGraph — Protótipo NetworkX
 
-Exploração inicial do tema 9 com NetworkX e Matplotlib para visualizar tarefas, dependências, ciclos e simulação de execução.
+Simulador de instalação e conflitos entre pacotes inspirado no Linux, com restrições de versão, dependências transitivas, backtracking, ciclos, transações e análise de remoção.
 
-A documentação completa foi centralizada em [`docs/prototipo-networkx/`](../../docs/prototipo-networkx/README.md), incluindo instalação, comandos, arquitetura, formato JSON, testes, limitações e uma galeria com seis imagens da interface.
+A documentação está em [docs/prototipo-networkx](../../docs/prototipo-networkx/README.md), incluindo dez imagens e os cenários de demonstração.
 
-## Início rápido
-
-Na raiz do repositório, com as dependências instaladas:
+Na raiz, com as dependências instaladas:
 
 ```bash
 python -m prototypes.networkx_preview
-```
-
-Para reproduzir as imagens da documentação sem abrir uma janela:
-
-```bash
+python -m prototypes.networkx_preview --cenario versoes
+python -m prototypes.networkx_preview --pedidos "modern-browser, libcore>=2.0"
 python -m prototypes.networkx_preview.gerar_imagens
 ```
 
-Este protótipo é exploratório; a versão acadêmica final deverá atender à exigência de implementação própria dos grafos e algoritmos descrita no [guia geral](../../agent.md).
+As dependências estão em `requirements.txt`. O catálogo sintético está em `examples/pacotes.json`. A entrada principal usa `package_app.py` e `package_model.py`.
 
-[Documentação completa do protótipo](../../docs/prototipo-networkx/README.md) · [Índice da documentação do projeto](../../docs/README.md)
+O primeiro exemplo de tarefas permanece disponível como histórico em `app.py`, `model.py` e na entrada `python -m prototypes.networkx_preview.tarefas`. Os argumentos antigos `--exemplo` e `--arquivo` pertencem apenas a essa entrada histórica.
+
+A versão acadêmica final deverá substituir o NetworkX por estrutura e algoritmos próprios conforme o enunciado.

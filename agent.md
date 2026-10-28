@@ -1,547 +1,271 @@
-# Guia do projeto — Gestão de Conflitos em Sistemas de Dependência
+# Guia do projeto — DepGraph
 
-Este documento orienta o planejamento, a implementação, os testes e a entrega do trabalho de Grafos do grupo, que escolheu o **tema 9**. A fonte dos requisitos acadêmicos é o arquivo [TP.pdf](TP.pdf), presente na raiz do repositório.
+## 1. Contexto e decisão de escopo
 
-**Decisão posterior do grupo:** a pedido do usuário, foi criado um protótipo exploratório em [`prototypes/networkx_preview/`](prototypes/networkx_preview/) usando NetworkX e Matplotlib para a visualização inicial. Esse protótipo também usa a biblioteca para análise de ciclos e ordenação, sem representar implementação própria. A escolha foi autorizada para essa exploração; a restrição do PDF continua registrada para a entrega acadêmica. As orientações de implementação própria abaixo se referem à versão final. Ver [documentação do protótipo](docs/prototipo-networkx/README.md).
+O grupo escolheu o **tema 9 — Gestão de Conflitos em Sistemas de Dependência**. A referência acadêmica é [TP.pdf](TP.pdf).
 
-**Organização da documentação:** centralizar os guias e artefatos explicativos em [`docs/`](docs/README.md), com subpastas por assunto e imagens junto ao respectivo guia. Este `agent.md` e o enunciado original permanecem na raiz.
+O tema permite dependências entre tarefas ou pacotes. O usuário esclareceu que deseja um sistema inspirado nos gerenciadores de pacotes Linux. Portanto, o foco atual é **resolver e visualizar dependências e conflitos de instalação de pacotes**, com versões, bibliotecas compartilhadas e estado instalado.
 
-As seções identificadas como **exigências do enunciado** resumem o PDF. As demais apresentam uma **proposta de solução para o grupo**, que pode ser ajustada sem perder os requisitos obrigatórios. Este guia não substitui o relatório em LaTeX; a implementação final descrita aqui permanece planejada.
+O primeiro exemplo de tarefas foi substituído. Não usar seus fluxos de compilar/testar/empacotar como apresentação principal do trabalho. O histórico foi preservado em [docs/prototipo-networkx/tarefas-historico.md](docs/prototipo-networkx/tarefas-historico.md).
 
-## 1. Tema e objetivo
+Este arquivo distingue as exigências do professor das decisões do grupo. O enunciado exige ciclos, visualização e execução segura com ordenação topológica; o foco em pacotes e as regras de versão abaixo detalham a aplicação escolhida.
 
-### Exigências do enunciado
+## 2. Estado atual
 
-O tema 9, apresentado na página 2 do PDF, é:
+Há um protótipo exploratório em [prototypes/networkx_preview](prototypes/networkx_preview/), autorizado pelo usuário para visualização inicial. A entrada principal é:
 
-> Gestão de Conflitos em Sistemas de Dependência
+```bash
+python -m prototypes.networkx_preview
+```
 
-O sistema deve modelar dependências entre tarefas ou pacotes, detectar ciclos, visualizar dependências e permitir execução segura baseada em ordenação topológica.
+Ele usa NetworkX para grafos e Matplotlib para interface, com catálogo sintético de 27 nomes e 32 versões. O exemplo `desktop-suite` resulta em 17 pacotes, 26 dependências e 15 novas instalações sobre uma base de dois pacotes já instalados.
 
-O objetivo geral do trabalho é desenvolver uma ferramenta computacional que use grafos como estrutura central para resolver um problema aplicado. O grupo deve definir a estrutura do grafo, implementar algoritmos adequados, construir uma interface de interação, avaliar os resultados, demonstrar a correção da solução, analisar sua complexidade e discutir suas limitações.
+O código atual possui resolução de restrições por backtracking, verificação de conflitos, dependências ausentes e ciclos, plano topológico, atualização explícita, simulação de transação e análise de remoção. Os detalhes e as dez imagens estão no [guia do protótipo](docs/prototipo-networkx/README.md).
 
-### Proposta para o grupo
+**Restrição acadêmica:** o PDF proíbe bibliotecas prontas para criação e processamento do grafo, como NetworkX, salvo comparação de desempenho. A autorização do usuário para explorar NetworkX não muda o enunciado. A entrega final precisa de estrutura e algoritmos de grafos próprios, salvo autorização do professor.
 
-Desenvolver um **gerenciador de dependências entre tarefas**, com cadastro de tarefas, definição de pré-requisitos, visualização do grafo e simulação da execução em uma ordem válida.
+## 3. Requisitos acadêmicos obrigatórios
 
-Exemplo de aplicação: um fluxo de desenvolvimento em que compilar depende de preparar o ambiente, testar depende de compilar e empacotar depende de testar.
-
-Neste projeto, um conflito estrutural é uma dependência circular que impede a conclusão de todas as tarefas. Conflitos de versões de pacotes, disponibilidade de recursos e incompatibilidades de software ficam fora do escopo proposto.
-
-## 2. Regras acadêmicas e entregas obrigatórias
-
-As informações abaixo foram extraídas das páginas 1 a 3 do PDF:
-
-| Item | Exigência |
+| Item | Exigência do PDF |
 | --- | --- |
+| Objetivo | Modelar, implementar e analisar um problema aplicado usando grafos como estrutura central. |
+| Grupo | Até seis integrantes. |
+| Linguagens | C/C++, Java ou Python. |
 | Valor | 15 pontos. |
-| Grupo | Até 6 alunos. |
-| Linguagem | C/C++, Java ou Python. |
-| Interface | Interface gráfica que apresente os resultados; o PDF não limita o framework de frontend. |
-| Grafos | Implementação própria da criação e do processamento do grafo. Bibliotecas prontas, como NetworkX, são proibidas, salvo para comparação de desempenho. |
-| Versionamento | Código e histórico de desenvolvimento no Git; commits individuais serão avaliados. |
+| Interface | Interface gráfica que apresente os resultados, sem limitação de framework de frontend. |
 | Modelagem | A utilização de diagramas UML será avaliada. |
-| Relatório | De 12 a 15 páginas, em LaTeX, usando obrigatoriamente o template oficial da SBC. |
-| Conteúdo do relatório | Contextualização, modelagem, artefatos, diagramas, telas, resultados, desempenho, conclusões e responsabilidades de cada integrante. |
-| Apresentação presencial | Apresentação oral com demonstração, slides, participação de todos os integrantes e duração de 10 minutos. |
-| Vídeo | Entre 12 e 18 minutos, com foco no funcionamento e na explicação das funcionalidades produzidas por cada aluno. |
-| Pacote de entrega | Arquivo `.zip` contendo o código-fonte da ferramenta, o código-fonte do relatório (`.tex`) e o PDF do relatório. |
-| Entrega individual | Cada integrante deve entregar sua própria cópia no Canvas; a entrega de outro membro não substitui essa obrigação. |
-| Prazo | O cabeçalho informa **22/11**, sem ano. O texto determina entrega até **23:59**, observando a data da tarefa no Canvas. Confirmar o prazo no Canvas. |
-| Integridade | Cópias serão zeradas. O PDF também informa que a falta de qualquer item obrigatório resulta em nota zero. |
+| Algoritmos | Demonstrar correção, analisar complexidade e discutir limitações. |
+| Dados | O PDF orienta procurar bases em sites como Kaggle para execução e testes. |
+| Versionamento | Repositório Git com histórico; commits individuais serão avaliados. |
+| Relatório | LaTeX no template oficial SBC, obrigatório, com 12 a 15 páginas. |
+| Conteúdo do relatório | Contextualização, modelagem, diagramas, resultados, telas, desempenho, conclusões e responsabilidades de cada integrante. |
+| Apresentação | Presencial, oral, com demonstração e slides, duração de 10 minutos e participação de todos. |
+| Vídeo | De 12 a 18 minutos, focado no funcionamento e nas funcionalidades produzidas por cada aluno. |
+| Pacote | `.zip` com código-fonte da ferramenta, fontes do relatório `.tex` e PDF do relatório. Incluir recursos necessários para compilar. |
+| Entrega | Cada integrante deve enviar sua própria cópia no Canvas; a entrega de colegas não substitui a obrigação. |
+| Prazo | Cabeçalho informa 22/11, sem ano. O texto determina 23:59 e a data da tarefa no Canvas; confirmar ali o prazo. |
+| Penalidades | Cópias serão zeradas. O PDF informa nota zero se faltar algum item obrigatório. |
 
-Template indicado pelo enunciado: [SBC Conferences Template no Overleaf](https://www.overleaf.com/latex/templates/sbc-conferences-template/blbxwjwzdngr).
+Template indicado: [SBC Conferences Template](https://www.overleaf.com/latex/templates/sbc-conferences-template/blbxwjwzdngr).
 
-O PDF exige vídeo e slides, mas não detalha como enviá-los. Conferir no Canvas a forma de entrega desses materiais e do endereço do repositório, sem presumir que apenas o `.zip` atende a todos os itens.
+O Canvas deve ser consultado para confirmar o envio do vídeo, slides e endereço do repositório, pois o PDF não detalha esses procedimentos. Todas as três etapas têm a mesma data de entrega. Variações do tema precisam de autorização do professor.
 
-Variações do tema precisam de autorização prévia do professor. O recorte de tarefas proposto aqui corresponde diretamente à alternativa de tarefas descrita no tema 9.
+## 4. Integrantes
 
-## 3. Escopo funcional proposto
+- Lucas Batista
+- Caio Kfuri
+- Arthur
+- Rafael Abras
+- David
+- Joao Heleno
 
-### Funcionalidades principais
+Não inventar sobrenomes, matrículas ou atribuições. Registrar responsabilidades reais quando forem distribuídas.
 
-1. Cadastrar tarefas com identificador único, nome e descrição opcional.
-2. Editar os dados descritivos e remover tarefas.
-3. Cadastrar e remover dependências entre tarefas existentes.
-4. Carregar e salvar um projeto em arquivo JSON.
-5. Mostrar o grafo dirigido com nomes e setas legíveis.
-6. Detectar se existe ciclo e apresentar pelo menos um caminho que o evidencie.
-7. Calcular e apresentar uma ordenação topológica quando o grafo for acíclico.
-8. Simular a execução das tarefas respeitando suas dependências.
-9. Exibir mensagens claras para entradas inválidas, ciclos e estados de execução.
-10. Disponibilizar exemplos válidos e exemplos com ciclos para testes e demonstração.
+## 5. Problema aplicado e funcionalidades
 
-Essas funcionalidades detalham a proposta do grupo; o PDF não exige especificamente JSON, campos de cadastro ou uma linguagem de interface.
+O usuário informa um ou mais pacotes para instalar. A ferramenta consulta um catálogo com versões, dependências e incompatibilidades, considera o estado instalado e constrói um plano ou apresenta o motivo de bloqueio.
 
-### Limites da primeira versão
+Funcionalidades do escopo:
 
-- A execução será uma **simulação**, com estados de tarefas exibidos pela ferramenta. O sistema não executará comandos do sistema operacional nem instalará pacotes. Essa interpretação de execução segura deverá ficar explícita no relatório e na apresentação.
-- As dependências serão obrigatórias: uma tarefa somente pode executar depois que todos os seus pré-requisitos forem concluídos.
-- A execução simulada será sequencial. Paralelismo, prioridades, duração estimada e caminho crítico são extensões opcionais.
-- O sistema identificará conflitos, mas não removerá automaticamente dependências para resolvê-los. O usuário decidirá qual relação corrigir.
+1. Representar catálogo com múltiplas versões por pacote.
+2. Representar pacotes instalados e suas versões.
+3. Expandir dependências diretas e transitivas.
+4. Combinar restrições impostas a uma mesma biblioteca por diferentes aplicativos.
+5. Selecionar no máximo uma versão por nome, tentando alternativas quando necessário.
+6. Detectar dependência ausente, incompatibilidade de versões, conflito de coexistência e ciclo como diagnósticos distintos.
+7. Preservar dependentes já instalados ao planejar mudanças de versão.
+8. Calcular a ordem de instalação dos pacotes selecionados.
+9. Simular uma transação sem executar comandos reais.
+10. Consultar dependentes transitivos e o impacto de uma eventual remoção.
+11. Visualizar relações e explicar os resultados na interface.
+12. Exportar informações para documentação e experimentos.
 
-## 4. Modelagem do grafo
+Um conflito não precisa ser um ciclo. Se dois pacotes exigem `libssl >=2.0` e `libssl <2.0`, a seleção de versões é impossível mesmo em um grafo acíclico.
 
-### Definição formal
+## 6. Modelagem
 
-Utilizar um grafo dirigido `G = (V, E)`:
+### Catálogo e grafo selecionado
 
-- Cada vértice de `V` representa uma tarefa.
-- Cada aresta de `E` representa uma dependência obrigatória.
-- A convenção será **`A → B` significa que B depende de A**. Portanto, A precisa terminar antes de B.
-- O grafo não terá pesos na primeira versão.
-- Arestas repetidas serão rejeitadas ou tratadas como operação sem efeito, sem alterar os graus.
-- Um laço `A → A` será considerado ciclo e apresentado como conflito.
-- Componentes desconexas e tarefas isoladas serão permitidas.
+O catálogo associa cada nome a uma lista de versões. Cada versão contém nome, versão, descrição, dependências e incompatibilidades.
 
-Essa direção deve ser preservada no código, no JSON, nos diagramas, nos testes e na interface. Inverter o significado de uma aresta leva a uma ordem de execução incorreta.
+A busca produz uma atribuição `nome → versão`. O grafo dirigido do plano contém um vértice por nome selecionado, com a versão como atributo. A convenção é:
 
-### Estruturas de dados propostas
+**A → B significa que B depende de A.**
 
-Implementar uma classe própria `GrafoDependencias` usando estruturas básicas da linguagem:
+Isso permite usar a ordenação topológica diretamente como ordem de instalação. No catálogo, o metadado de B lista A como dependência; a construção do grafo precisa preservar essa orientação.
 
-- Mapa de identificadores para objetos `Tarefa`.
-- Lista de adjacência: para cada tarefa, guardar suas sucessoras, que dependem dela.
-- Mapa de predecessoras para consultar os pré-requisitos de cada tarefa.
-- Grau de entrada calculado a partir das dependências ou mantido de forma consistente nas operações de edição.
+As incompatibilidades são restrições separadas. Não inseri-las como dependências, nem tentar resolvê-las apenas com ordenação topológica. A interface pode desenhar uma linha de conflito sem incluí-la no grafo de precedência.
 
-Uma representação com mapas e conjuntos evita arestas duplicadas e permite consultar tarefas por identificador. As complexidades com mapas e conjuntos pressupõem operações de acesso com custo médio constante.
+Arestas de dependência não têm pesos. Bibliotecas compartilhadas aparecem uma vez por nome, ainda que sejam exigidas por vários pacotes. Tarefas de execução e dependências opcionais não fazem parte da primeira versão de pacotes.
 
-Os algoritmos devem trabalhar sobre essa implementação própria. Não delegar criação, detecção de ciclos, ordenação ou outros processamentos a bibliotecas de grafos.
+### Estruturas próprias da versão final
 
-### Exemplo sem conflito
+- Mapa de nomes para versões e metadados do catálogo.
+- Mapa de nomes para versões instaladas.
+- Mapa da atribuição de versões em uma tentativa de resolução.
+- Listas de adjacência para dependentes e predecessores.
+- Graus de entrada para ordenação topológica.
+- Lista de requisitos por nome, com identificação de quem impôs cada restrição.
+- Estado da transação e histórico de operações.
 
-```mermaid
-graph LR
-    A[Preparar ambiente] --> B[Compilar]
-    B --> C[Testar]
-    C --> D[Empacotar]
-    A --> E[Gerar documentação]
-```
+Não usar NetworkX no núcleo final. Estruturas básicas como mapas, conjuntos, listas e filas são adequadas para a implementação própria.
 
-Uma ordem válida é: preparar ambiente, compilar, testar, empacotar e gerar documentação. A documentação também pode aparecer antes de compilar, desde que seja executada depois de preparar o ambiente.
+## 7. Algoritmos e correção
 
-Uma ordenação topológica não é necessariamente única. O critério de correção é respeitar todas as arestas.
+### Resolução de versões
 
-### Exemplo com conflito
+Usar busca com retrocesso sobre candidatos, acumulando restrições e expandindo as dependências de cada versão escolhida. Descartar completamente as dependências de uma escolha abandonada. Verificar também as dependências e os conflitos dos pacotes instalados preservados.
 
-```mermaid
-graph LR
-    A[Tarefa A] --> B[Tarefa B]
-    B --> C[Tarefa C]
-    C --> A
-```
+O protótipo prefere versões mais altas e busca uma solução viável, sem garantir otimização global. Pacotes instalados ficam fixos, exceto os explicitamente incluídos no pedido. Documentar essa política; não apresentar seus bloqueios como impossibilidade sob toda política possível de atualização.
 
-O caminho `A → B → C → A` forma um ciclo. Nenhuma dessas três tarefas pode iniciar respeitando todos os pré-requisitos.
+Ao atingir um limite de recursos, informar resultado inconclusivo. Não afirmar inexistência de solução sem concluir a busca dentro do escopo definido.
 
-## 5. Algoritmos e comportamento esperado
+### Ordenação topológica
 
-### 5.1. Ordenação topológica — algoritmo de Kahn
+Na versão final, implementar Kahn com cópia dos graus de entrada e fila FIFO. Cada vértice só pode ser incluído quando não tiver predecessores pendentes. Se o total processado for menor que o número de vértices, não existe ordem completa.
 
-Implementação proposta:
+Não alterar o grafo original durante a análise. Não confundir todos os vértices restantes com membros de um ciclo: alguns podem ser apenas dependentes bloqueados.
 
-1. Calcular uma cópia dos graus de entrada de todos os vértices.
-2. Inserir em uma fila todos os vértices com grau de entrada zero.
-3. Retirar um vértice da fila e adicioná-lo à ordem resultante.
-4. Para cada sucessor, diminuir o grau de entrada na cópia e colocá-lo na fila quando o grau chegar a zero.
-5. Repetir até a fila ficar vazia.
-6. Comparar a quantidade de vértices processados com `|V|`.
+### Ciclos
 
-Se todos forem processados, a ordem é válida. Caso contrário, existe ciclo e não existe ordenação topológica completa.
+Implementar DFS com estados branco/cinza/preto e reconstrução de um caminho fechado ao encontrar aresta para um vértice cinza. Percorrer todas as componentes. Mostrar pelo menos um ciclo real; enumerar todos os ciclos não é requisito da primeira versão.
 
-A operação não deve modificar as dependências ou os graus persistentes do projeto. Executar a análise várias vezes deve produzir resultados consistentes.
+A política didática rejeita ciclos para exigir precedência estrita. Gerenciadores Linux reais possuem regras adicionais; não equiparar essa simplificação à semântica completa de APT/dpkg.
 
-**Política proposta:** se houver qualquer ciclo, bloquear a simulação completa, mesmo que Kahn encontre um prefixo executável em outra parte do grafo. Mostrar esse prefixo, se desejado, apenas como resultado parcial da análise.
+### Dependentes e remoção
 
-Os vértices restantes após Kahn podem incluir tarefas apenas bloqueadas por um ciclo. Não afirmar que todos eles pertencem ao ciclo.
+A partir do pacote analisado, percorrer seus sucessores para obter dependentes diretos e transitivos. Uma remoção em cascata exige ordem inversa da ordenação topológica do conjunto afetado. A funcionalidade atual apenas analisa o impacto; não remove pacotes.
 
-### 5.2. Identificação de um ciclo — busca em profundidade
+### Transação simulada
 
-Implementar DFS com três estados:
+Planejar e validar antes de avançar. Preparar um pacote por passo, garantindo que seus pré-requisitos tenham versão adequada no estado temporário. Atualizar o estado instalado somente ao concluir e validar a transação inteira.
 
-- Branco: vértice ainda não visitado.
-- Cinza: vértice no caminho de busca atual.
-- Preto: vértice com exploração concluída.
+Se o pedido ou o estado instalado mudar, exigir nova análise. Reiniciar uma preparação parcial descarta o progresso em memória. Não executar scripts de instalação reais.
 
-Uma aresta que aponta para um vértice cinza identifica um ciclo. Manter predecessores da busca ou a pilha do caminho ativo para reconstruir e apresentar uma sequência como `A → B → C → A`.
+### Complexidade
 
-A busca precisa iniciar também nos vértices ainda não visitados de outras componentes. Um ciclo fora da componente inicial também deve ser encontrado.
+| Componente | Discussão esperada |
+| --- | --- |
+| Grafo por adjacência | Espaço `O(V + E)`. |
+| Kahn com fila | Tempo `O(V + E)` e memória auxiliar `O(V)`. |
+| DFS e reconstrução de um ciclo | Tempo `O(V + E)` e memória auxiliar `O(V)`. |
+| Busca de dependentes | Tempo `O(V + E)` no pior caso. |
+| Seleção por backtracking | Pode ser exponencial nas combinações de versões; medir candidatos explorados e definir limites. |
+| Interface | Medir e discutir separadamente do tempo dos algoritmos. |
 
-Preferir implementação iterativa quando forem usados grafos grandes, evitando o limite de recursão da linguagem. Se a implementação for recursiva, documentar esse limite.
+A linearidade de DFS e Kahn não implica linearidade da resolução de restrições. Justificar a correção por preservação de requisitos, descarte de escolhas inválidas e propriedade de precedência da ordem obtida.
 
-Detectar pelo menos um ciclo é suficiente para a proposta inicial. Encontrar todos os ciclos simples não faz parte do escopo. Componentes fortemente conexas podem ser uma extensão, caso o grupo queira identificar todos os grupos envolvidos em dependências circulares.
+## 8. Arquitetura e UML
 
-### 5.3. Simulação de execução segura
+O protótipo está dividido em `package_model.py` e `package_app.py`. O modelo contém catálogo, requisitos, pacotes, plano e sessão. A interface contém controles, visualização, diagnósticos e inspeção.
 
-Estados propostos: `pendente`, `em execução` e `concluída`.
-
-Fluxo:
-
-1. Validar o grafo e calcular a ordenação topológica.
-2. Se houver ciclo, mostrar o conflito e manter a execução bloqueada.
-3. Se o grafo for acíclico, disponibilizar início e avanço passo a passo.
-4. Antes de executar cada tarefa, verificar que todas as suas predecessoras estão concluídas.
-5. Atualizar a tarefa atual, os estados e o histórico visível na interface.
-6. Ao concluir todas as tarefas, apresentar o resultado final.
-
-Qualquer alteração em tarefas ou dependências invalida a ordem calculada e os estados da simulação. A próxima execução deve partir de nova análise. Uma opção simples é bloquear edição enquanto a simulação estiver em andamento e exigir seu encerramento para editar.
-
-### 5.4. Justificativa de correção
-
-O relatório deve explicar que Kahn seleciona apenas vértices sem predecessores pendentes. Ao retirar uma tarefa, remove conceitualmente suas arestas de saída; assim, cada tarefa adicionada à ordem tem todos os seus pré-requisitos anteriores a ela.
-
-Se o algoritmo parar antes de processar todos os vértices, cada vértice restante possui algum predecessor restante. Em um grafo finito, seguir essas dependências leva à repetição de um vértice, evidenciando um ciclo.
-
-Na DFS, uma aresta para um vértice cinza fecha um caminho dirigido ainda ativo e, portanto, forma um ciclo. A verificação dos pré-requisitos antes de cada passo preserva a regra de execução da simulação.
-
-### 5.5. Complexidade esperada
-
-Considere `V` como o conjunto de tarefas e `E` como o conjunto de dependências.
-
-| Operação | Tempo esperado | Memória adicional |
-| --- | --- | --- |
-| Armazenar o grafo e as predecessoras | Construção em `O(|V| + |E|)` | Estrutura total em `O(|V| + |E|)`. |
-| Calcular graus de entrada | `O(|V| + |E|)` | `O(|V|)`. |
-| Ordenar com Kahn usando fila | `O(|V| + |E|)` | `O(|V|)`, sem contar o grafo. |
-| Buscar e reconstruir um ciclo com DFS | `O(|V| + |E|)` | `O(|V|)`, sem contar o grafo. |
-| Validar uma ordem fornecida | `O(|V| + |E|)` | `O(|V|)` para posições e identificação dos vértices. |
-| Simular toda a sequência, verificando cada pré-requisito uma vez | `O(|V| + |E|)` | `O(|V|)` para estados e histórico. |
-
-Usar fila FIFO e critérios de inserção definidos para reprodutibilidade. Se o grupo optar por ordenar candidatos continuamente ou usar uma fila de prioridade, atualizar a análise de complexidade, pois a ordenação pode acrescentar fatores logarítmicos.
-
-O custo de renderizar o grafo e atualizar a interface deve ser discutido separadamente do custo dos algoritmos.
-
-## 6. Tecnologia e arquitetura propostas
-
-O enunciado permite C/C++, Java ou Python e não determina uma stack. Para uma primeira versão, recomenda-se **Python com Tkinter e Canvas**, mantendo a interface e a lógica na mesma linguagem. Verificar a disponibilidade do Tkinter no ambiente do grupo.
-
-- Estruturas básicas de Python para a implementação própria do grafo.
-- `collections.deque` para a fila de Kahn.
-- `json` para persistência.
-- `tkinter` e `Canvas` para formulários, mensagens, desenho de vértices e setas.
-- `unittest` para testes automatizados.
-- `time.perf_counter` para medições dos algoritmos.
-- LaTeX com template SBC para o relatório.
-
-O uso dessas ferramentas auxiliares não substitui a implementação dos algoritmos de grafos. A visualização proposta deve desenhar a estrutura já mantida pelo programa, sem recorrer a bibliotecas prontas de criação ou processamento de grafos.
-
-### Organização sugerida do repositório
-
-```text
-.
-├── TP.pdf
-├── agent.md
-├── README.md
-├── src/
-│   ├── main.py
-│   ├── models/
-│   │   ├── tarefa.py
-│   │   └── grafo_dependencias.py
-│   ├── algorithms/
-│   │   ├── ordenacao_topologica.py
-│   │   └── deteccao_ciclos.py
-│   ├── services/
-│   │   ├── persistencia.py
-│   │   └── simulacao.py
-│   └── ui/
-│       ├── janela_principal.py
-│       └── visualizacao_grafo.py
-├── data/
-│   ├── exemplos/
-│   └── experimentos/
-├── tests/
-├── experiments/
-├── docs/
-│   ├── modelagem/
-│   ├── resultados/
-│   └── apresentacao/
-└── report/
-    ├── main.tex
-    ├── referencias.bib
-    └── figuras/
-```
-
-Essa estrutura é um plano; os arquivos listados ainda precisam ser criados durante o desenvolvimento. O núcleo de grafos e algoritmos deve funcionar sem abrir a interface, permitindo testes independentes.
-
-### Modelo de classes para orientar o UML
+Para a versão final, separar catálogo, estrutura de grafo, resolução, algoritmos, persistência, transação e interface. O núcleo precisa funcionar sem abrir uma janela, permitindo testes e experimentos.
 
 ```mermaid
 classDiagram
-    class Tarefa {
-        +id: str
-        +nome: str
-        +descricao: str
+    class Catalogo {
+        +versoesPorNome
+        +consultar(nome)
+    }
+    class Pacote {
+        +nome
+        +versao
+        +dependencias
+        +incompatibilidades
+    }
+    class Resolvedor {
+        +planejar(pedido, instalados)
     }
     class GrafoDependencias {
-        +tarefas: dict
-        +sucessoras: dict
-        +predecessoras: dict
-        +adicionar_tarefa(tarefa)
-        +remover_tarefa(id)
-        +adicionar_dependencia(origem, destino)
-        +remover_dependencia(origem, destino)
+        +sucessores
+        +predecessores
+        +ordenar()
+        +encontrarCiclo()
     }
-    class AnalisadorGrafo {
-        +ordenar_topologicamente(grafo)
-        +encontrar_ciclo(grafo)
-    }
-    class Simulador {
-        +estados: dict
-        +iniciar(grafo)
+    class Transacao {
+        +estadoInicial
+        +preparados
         +avancar()
-        +reiniciar()
+        +concluir()
     }
-    class PersistenciaJSON {
-        +carregar(caminho)
-        +salvar(grafo, caminho)
-    }
-    class InterfaceGrafica {
-        +mostrar_grafo()
-        +mostrar_resultado()
-    }
-    GrafoDependencias "1" o-- "0..*" Tarefa
-    AnalisadorGrafo ..> GrafoDependencias
-    Simulador ..> GrafoDependencias
-    Simulador ..> AnalisadorGrafo
-    PersistenciaJSON ..> GrafoDependencias
-    InterfaceGrafica ..> GrafoDependencias
-    InterfaceGrafica ..> AnalisadorGrafo
-    InterfaceGrafica ..> Simulador
-    InterfaceGrafica ..> PersistenciaJSON
+    Catalogo o-- Pacote
+    Resolvedor ..> Catalogo
+    Resolvedor ..> GrafoDependencias
+    Transacao ..> Resolvedor
 ```
 
-Produzir também um diagrama UML de casos de uso e um diagrama de sequência para analisar e simular a execução. Exportar figuras legíveis para o relatório; revisar os diagramas para que reflitam a implementação final.
+Esse diagrama é uma proposta conceitual para a versão final. Ajustá-lo à implementação e produzir também casos de uso e sequência de planejamento/execução. Exportar figuras legíveis para o relatório.
 
-## 7. Formato de entrada e validações
+## 9. Dados e testes
 
-Formato JSON proposto:
+O catálogo atual é sintético e está em `prototypes/networkx_preview/examples/pacotes.json`. Não apresentá-lo como base real de Linux. Pesquisar bases externas adequadas, registrar fonte, licença e transformação e justificar o uso de dados sintéticos quando necessário.
 
-```json
-{
-  "tarefas": [
-    { "id": "A", "nome": "Preparar ambiente", "descricao": "" },
-    { "id": "B", "nome": "Compilar", "descricao": "" },
-    { "id": "C", "nome": "Testar", "descricao": "" },
-    { "id": "D", "nome": "Empacotar", "descricao": "" }
-  ],
-  "dependencias": [
-    { "origem": "A", "destino": "B" },
-    { "origem": "B", "destino": "C" },
-    { "origem": "C", "destino": "D" }
-  ]
-}
-```
+Casos essenciais:
 
-Validações propostas:
+- Fechamento transitivo com bibliotecas compartilhadas.
+- Ordem que respeite todas as arestas, sem exigir uma única sequência possível.
+- Versões numericamente comparadas e intervalos com várias condições.
+- Versão instalada preservada e atualização explicitamente autorizada pelo pedido.
+- Atualização que prejudicaria outro pacote instalado.
+- Conflito declarado em apenas uma direção, verificado nos dois sentidos de seleção.
+- Dependência ausente, laço e ciclo em componente desconexa.
+- Escolha de versão alternativa sem dependências residuais da tentativa anterior.
+- Limite de busca com resultado inconclusivo.
+- Transação parcial sem mudança no estado instalado e confirmação do estado final.
+- Pedido ou estado modificado após o planejamento.
+- Dependentes afetados e ordem inversa de remoção.
+- Validação de catálogo e renderização da interface.
 
-- Exigir identificadores únicos e não vazios, com tipo consistente.
-- Exigir nomes não vazios e validar o formato dos campos e das listas.
-- Rejeitar dependências cujas tarefas não existam.
-- Tratar dependências duplicadas sem contar graus de entrada duas vezes.
-- Aceitar grafos com ciclos como dados analisáveis, destacando o conflito e bloqueando a simulação.
-- Aceitar grafo vazio e apresentar mensagem apropriada, sem falha.
-- Ao remover uma tarefa, remover também todas as suas arestas de entrada e saída.
-- Carregar e validar o arquivo em uma estrutura temporária antes de substituir o projeto aberto, preservando os dados atuais em caso de erro.
-- Ao salvar e reabrir um arquivo, preservar tarefas e dependências.
+A suíte atual combina 18 testes de pacotes com os 11 testes históricos de tarefas. Registrar os resultados efetivamente executados; não inventar métricas.
 
-## 8. Interface gráfica proposta
+Nos experimentos, variar quantidade de pacotes, arestas, versões por nome, compartilhamento e tipos de conflito. Fixar sementes, repetir medições, registrar ambiente e dispersão. Separar resolução, algoritmos de grafo, leitura e desenho. Qualquer comparação com NetworkX deve ficar isolada do funcionamento final.
 
-Organizar a janela em três áreas:
-
-1. **Edição:** lista de tarefas, formulário de cadastro e seleção da origem e do destino de uma dependência, com a indicação “origem deve terminar antes do destino”.
-2. **Grafo:** vértices nomeados, arestas com setas, destaque de um ciclo encontrado e estados da simulação.
-3. **Resultados:** diagnóstico, ordenação topológica, tarefa atual e histórico da execução.
-
-Ações principais: novo projeto, abrir, salvar, adicionar/remover tarefa, adicionar/remover dependência, analisar grafo, iniciar simulação, avançar e reiniciar.
-
-Para grafos acíclicos pequenos, uma disposição em camadas pode representar a progressão dos pré-requisitos. Para grafos com ciclos, usar uma disposição circular simples, implementada pelo grupo, para que a visualização não dependa da existência de uma ordenação topológica.
-
-A indicação de conflito deve conter texto e caminho do ciclo, além de cor. Para grafos grandes, documentar a perda de legibilidade e separar os experimentos dos algoritmos da visualização interativa.
-
-## 9. Dados, testes e avaliação
-
-### Origem dos dados
-
-O enunciado orienta procurar bases em sites como Kaggle para execução e testes; não especifica um conjunto de dados obrigatório.
-
-O grupo deve pesquisar dados de dependências entre tarefas ou pacotes e registrar a fonte, a licença, o formato original e a transformação para o grafo, quando utilizar dados externos. Se os dados originais usarem a convenção “tarefa → pré-requisito”, inverter as arestas na importação para respeitar a convenção deste projeto.
-
-Usar também exemplos sintéticos pequenos com respostas conhecidas e geradores próprios para experimentos controlados. Identificar esses dados como sintéticos. Se não houver base externa adequada, registrar a pesquisa e justificar o uso de dados sintéticos no relatório.
-
-### Casos de teste essenciais
-
-| Caso | Resultado esperado |
-| --- | --- |
-| Grafo vazio | Análise sem erro, ordem vazia e mensagem de ausência de tarefas. |
-| Uma tarefa isolada | Ordem com essa tarefa e simulação concluída. |
-| Cadeia `A → B → C` | A aparece antes de B, e B antes de C. |
-| Bifurcação `A → B` e `A → C` | A precede B e C; B e C podem trocar de posição. |
-| Junção `A → C` e `B → C` | C executa somente após A e B. |
-| Componentes desconexas e tarefas isoladas | Todos os vértices aparecem exatamente uma vez na ordem. |
-| Ciclo `A → B → C → A` | Ciclo identificado e simulação bloqueada. |
-| Laço `A → A` | Conflito identificado. |
-| Ciclo em outra componente | Conflito encontrado mesmo fora da componente inicial. |
-| Ciclo com tarefa dependente externa | A tarefa bloqueada não é apresentada como integrante do ciclo sem evidência. |
-| Identificador repetido ou dependência inexistente | Entrada rejeitada com mensagem clara. |
-| Aresta repetida | Nenhuma duplicação nem corrupção dos graus. |
-| Remoção de tarefa | Arestas relacionadas removidas e estrutura consistente. |
-| Análises repetidas | Grafo preservado e resultados válidos. |
-| Edição após análise | Ordem anterior invalidada e nova análise exigida. |
-| JSON inválido | Erro informado e projeto aberto preservado. |
-| Salvar e carregar | Mesmas tarefas e dependências após reabertura. |
-
-Para validar uma ordenação, verificar que ela contém exatamente os vértices do grafo, sem repetição, e que `posição(origem) < posição(destino)` para toda aresta. Não exigir uma única sequência quando existirem várias respostas corretas.
-
-Para validar um ciclo informado, verificar que o caminho retorna ao vértice inicial e que todas as suas arestas existem no grafo.
-
-### Experimentos de desempenho
-
-- Gerar grafos acíclicos de tamanhos crescentes, controlando quantidade de vértices e densidade de arestas. Uma estratégia é fixar uma ordem dos vértices e permitir apenas arestas de posições anteriores para posteriores.
-- Criar casos cíclicos adicionando uma aresta de retorno a um caminho dirigido já existente, garantindo que um ciclo seja realmente formado.
-- Fixar e registrar sementes de geração para reprodução.
-- Medir Kahn e DFS separadamente da leitura de arquivos e da renderização.
-- Repetir as medições e registrar quantidade de execuções, média e alguma medida de dispersão.
-- Registrar linguagem, versão, sistema operacional, hardware, `|V|`, `|E|` e classificação de cada instância.
-- Comparar os resultados com a análise assintótica e explicar limitações práticas.
-
-Os tamanhos e o número de repetições devem ser definidos após uma execução piloto no ambiente do grupo. Não inventar resultados ou apresentar estimativas como medições.
-
-NetworkX ou outra biblioteca pronta poderá aparecer apenas em um experimento separado de comparação de desempenho, conforme a exceção do PDF. Não deve ser dependência do funcionamento da ferramenta ou de seus algoritmos próprios.
-
-## 10. Etapas de desenvolvimento
-
-O PDF divide o trabalho em três etapas, **todas com a mesma data de entrega**. Os marcos internos abaixo são sugestões de organização.
+## 10. Etapas, equipe e relatório
 
 ### Etapa 1 — Modelagem e planejamento
 
-Exigência: definir tema, problema, dados, modelagem do grafo e plano de desenvolvimento, considerando a avaliação do uso de UML.
+Entregar descrição do problema, justificativa da modelagem e plano. Definir requisitos, política de versões, dados, UML, arquitetura e responsabilidades.
 
-Atividades propostas:
+### Etapa 2 — Desenvolvimento
 
-1. Formalizar o recorte de tarefas e a convenção das arestas.
-2. Registrar requisitos, limites e critérios de aceitação.
-3. Pesquisar bases e preparar exemplos pequenos.
-4. Produzir os diagramas UML.
-5. Distribuir responsabilidades e definir marcos internos.
+Entregar protótipo funcional com código versionado. Implementar núcleo próprio, integrar resolução, interface, persistência, testes e experimentos. A tecnologia da versão final pode ser Python com interface gráfica adequada; não tratar Tkinter como escolha obrigatória. O protótipo atual usa Matplotlib.
 
-Entregável do enunciado: documento com descrição do problema, justificativa da modelagem e plano de desenvolvimento.
+### Etapa 3 — Relatório e apresentação
 
-### Etapa 2 — Desenvolvimento da ferramenta
+Produzir relatório LaTeX/SBC de 12 a 15 páginas, apresentação presencial de 10 minutos, slides, vídeo de 12 a 18 minutos e demonstração. Todas as etapas têm a mesma data de entrega.
 
-Exigência: implementar estrutura de grafos, algoritmos e interface gráfica, buscar dados para execução e testes e manter o código versionado.
+Dividir o trabalho entre modelagem/dados, estrutura de grafos, resolução/algoritmos, interface/transação, testes/experimentos e documentação/apresentação. Cada integrante deve ter contribuições identificáveis e commits próprios; todos participam da apresentação. Registrar os responsáveis reais no relatório.
 
-Sequência proposta:
+Estrutura sugerida do relatório: introdução, fundamentação, modelagem/UML, arquitetura e implementação, correção e complexidade, metodologia experimental, resultados e telas, discussão/limitações, conclusão, contribuições e referências. O PDF não esclarece exceções na contagem de páginas para referências ou anexos; não presumir que estejam fora do limite.
 
-1. Implementar tarefas e grafo com operações de edição.
-2. Implementar Kahn, DFS e testes de correção.
-3. Implementar persistência e exemplos.
-4. Construir a interface e o desenho do grafo.
-5. Integrar análise e simulação.
-6. Validar os fluxos completos e executar os experimentos.
+## 11. Limites do modelo
 
-Entregável do enunciado: protótipo funcional com código versionado no Git.
+O simulador não implementa o formato de pacotes Debian/RPM, comparação completa de versões de distribuições, arquiteturas, pacotes virtuais, alternativas com `|`, scripts de manutenção, conflitos de arquivos ou otimização de downloads. Não representa todas as regras de um gerenciador Linux real.
 
-### Etapa 3 — Apresentação e relatório final
+Versões seguem um a três componentes numéricos. Há uma versão por nome no estado selecionado. Não existe remoção automática para resolver incompatibilidades. Esses limites devem aparecer no relatório e ser considerados na interpretação dos resultados.
 
-Exigência: contextualizar o problema, explicar a modelagem, analisar resultados e desempenho, apresentar conclusões e demonstrar a solução.
+Referência de domínio: [relações entre pacotes na Debian Policy](https://www.debian.org/doc/debian-policy/ch-relationships.html).
 
-Atividades propostas:
+## 12. Documentação e checklist
 
-1. Consolidar os resultados efetivamente obtidos.
-2. Escrever e compilar o relatório em LaTeX no template SBC.
-3. Produzir slides e ensaiar a demonstração de 10 minutos.
-4. Gravar o vídeo de 12 a 18 minutos com participação dos integrantes.
-5. Revisar o histórico Git e a descrição das contribuições.
-6. Preparar o pacote e conferir a entrega individual de todos os membros.
+Centralizar documentos e imagens em [docs/](docs/README.md), em subpastas temáticas. Este arquivo e o PDF permanecem na raiz. Manter a documentação atual de pacotes separada do histórico de tarefas.
 
-Entregáveis: relatório, apresentação e demonstração, vídeo e repositório com histórico de desenvolvimento, observando as regras de envio do Canvas.
+Antes de entregar:
 
-## 11. Divisão de responsabilidades sugerida
+- [ ] Núcleo próprio de grafos e algoritmos implementado e validado.
+- [ ] Resolução de restrições consistente com a política documentada.
+- [ ] Interface gráfica com exemplos válidos e diagnósticos de conflitos.
+- [ ] Plano e simulação respeitando pré-requisitos e estado instalado.
+- [ ] Dados, testes e experimentos reproduzíveis, com fontes e limites claros.
+- [ ] Modelagem e UML coerentes com o código final.
+- [ ] README com instruções reais de instalação, execução e testes.
+- [ ] Histórico Git com contribuições individuais.
+- [ ] Relatório SBC de 12 a 15 páginas, fontes e PDF conferidos.
+- [ ] Responsabilidades reais de todos os integrantes registradas.
+- [ ] Slides e apresentação de 10 minutos ensaiada com todos.
+- [ ] Vídeo de 12 a 18 minutos sobre funcionalidades e contribuições.
+- [ ] `.zip` com código e todos os arquivos do relatório.
+- [ ] Envio dos demais materiais e prazo confirmados no Canvas.
+- [ ] Entrega individual realizada por cada membro.
 
-Adaptar à quantidade real de integrantes e registrar nomes no relatório:
-
-| Frente | Responsabilidade principal |
-| --- | --- |
-| Modelagem e dados | Problema, requisitos, convenção das arestas, UML e preparação de dados. |
-| Estrutura de grafos | Tarefas, adjacência, predecessoras, edição e consistência. |
-| Algoritmos | Kahn, DFS, reconstrução de ciclo, correção e complexidade. |
-| Interface e simulação | Formulários, visualização, estados e integração. |
-| Testes e experimentos | Validações, geração de instâncias, medições e análise. |
-| Documentação e apresentação | Integração do relatório, figuras, slides, roteiro e vídeo. |
-
-Com menos de seis integrantes, combinar frentes. Cada membro deve ter contribuições identificáveis, commits próprios e participação na apresentação. A documentação pode ter uma pessoa responsável pela integração, mas cada integrante deve explicar o que implementou.
-
-## 12. Estrutura sugerida do relatório
-
-Respeitar o limite total de 12 a 15 páginas e o template SBC. O PDF não esclarece exceções de contagem para referências ou anexos; não presumir que estejam fora do limite.
-
-1. Título, autores, resumo e demais elementos do template.
-2. Introdução: contexto, problema e objetivos.
-3. Fundamentação: grafos dirigidos, ciclos, DAGs e ordenação topológica.
-4. Modelagem: tarefas, arestas, estrutura de dados, requisitos e UML.
-5. Implementação: arquitetura, algoritmos próprios, persistência, interface e simulação.
-6. Correção e complexidade: justificativas e custos dos algoritmos.
-7. Metodologia: dados, casos de teste, geração de instâncias e ambiente experimental.
-8. Resultados: testes, medições, gráficos e telas da ferramenta.
-9. Discussão: interpretação, limitações e possibilidades de evolução.
-10. Conclusão.
-11. Responsabilidades e contribuições de cada integrante.
-12. Referências das fontes efetivamente utilizadas.
-
-Incluir todos os artefatos relevantes produzidos, com figuras legíveis e explicadas no texto. Não inserir métricas, bases utilizadas ou funcionalidades que não tenham sido realmente verificadas.
-
-## 13. Roteiro de demonstração sugerido
-
-Na apresentação presencial de 10 minutos, reservar aproximadamente:
-
-- 1 minuto para problema e objetivo.
-- 2 minutos para modelagem e algoritmos.
-- 4 minutos para demonstrar cadastro, dependências, ordem válida e simulação; em seguida, introduzir um ciclo, mostrar o bloqueio e corrigir a dependência.
-- 2 minutos para resultados e desempenho.
-- 1 minuto para limitações e conclusão.
-
-No vídeo de 12 a 18 minutos, concentrar a explicação no funcionamento da ferramenta e nas funcionalidades produzidas por cada integrante, como determina o PDF.
-
-Preparar arquivos de exemplo antes das apresentações e ensaiar os fluxos para evitar depender de cadastros extensos durante a demonstração.
-
-## 14. Critérios de aceitação propostos
-
-A ferramenta estará pronta para a entrega quando:
-
-- [ ] O grafo for implementado pelo grupo, sem biblioteca pronta de criação ou processamento.
-- [ ] Tarefas e dependências puderem ser cadastradas, removidas, salvas e carregadas.
-- [ ] A convenção `A → B` como “B depende de A” estiver consistente em toda a aplicação.
-- [ ] A interface gráfica mostrar o grafo e os resultados de análise.
-- [ ] Kahn gerar uma ordem válida para todos os casos acíclicos testados.
-- [ ] A DFS identificar um ciclo real, inclusive em componentes desconexas e laços.
-- [ ] Grafos cíclicos bloquearem a simulação completa e apresentarem o motivo.
-- [ ] A simulação respeitar todos os pré-requisitos e invalidar resultados após edições.
-- [ ] Testes cobrirem os casos essenciais e os resultados estiverem registrados.
-- [ ] Experimentos tiverem dados reproduzíveis, medições reais e análise de complexidade.
-- [ ] O README explicar ambiente, instalação, execução, testes e uso dos exemplos.
-
-Checklist acadêmico final:
-
-- [ ] Documento da etapa de modelagem e planejamento.
-- [ ] Diagramas UML coerentes com a implementação final.
-- [ ] Código-fonte e histórico Git com contribuições individuais.
-- [ ] Relatório SBC em LaTeX, com 12 a 15 páginas e contribuições dos integrantes.
-- [ ] Fontes `.tex`, referências, imagens e arquivos necessários para compilar o relatório.
-- [ ] PDF final do relatório conferido.
-- [ ] Slides e apresentação presencial de 10 minutos, com todos os integrantes.
-- [ ] Vídeo de 12 a 18 minutos sobre as funcionalidades de cada membro.
-- [ ] `.zip` com código-fonte da ferramenta, fontes do relatório e PDF.
-- [ ] Forma de envio do vídeo, slides e repositório conferida no Canvas.
-- [ ] Prazo confirmado no Canvas e cópia entregue individualmente por cada membro.
-
-## 15. Orientações para quem continuar o desenvolvimento
-
-1. Usar o `TP.pdf` como referência principal para exigências acadêmicas e este arquivo como guia da proposta.
-2. Preservar a implementação própria do grafo, de Kahn e da DFS.
-3. Manter a orientação das arestas e a política de bloqueio por ciclos consistentes.
-4. Separar lógica, interface, persistência e simulação para facilitar testes e explicação no relatório.
-5. Manter os algoritmos utilizáveis sem interface gráfica.
-6. Atualizar modelagem, documentação e testes quando o comportamento mudar.
-7. Registrar as fontes dos dados, as contribuições reais e as limitações observadas.
-8. Não tratar sugestões deste guia como exigências adicionais do professor.
-9. Não declarar como concluído o que ainda for planejamento; verificar código, resultados e entregáveis antes de marcar os checklists.
+Não marcar funcionalidades planejadas como concluídas sem verificar código e evidências. Preservar as exigências do enunciado e as decisões atuais do usuário ao continuar o desenvolvimento.

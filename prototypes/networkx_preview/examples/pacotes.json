@@ -1,0 +1,423 @@
+{
+  "descricao": "Catálogo sintético inspirado em pacotes Linux; não são metadados de uma distribuição real.",
+  "instalados": {
+    "base-files": "1.0",
+    "libcore": "1.0"
+  },
+  "pacotes": [
+    {
+      "nome": "base-files",
+      "versao": "1.0",
+      "descricao": "Arquivos básicos do sistema simulado",
+      "depende": [],
+      "conflita": []
+    },
+    {
+      "nome": "libcore",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "base-files"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libcore",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "base-files"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libssl",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore",
+          "versao": ">=1.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libssl",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore",
+          "versao": ">=1.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libz",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libxml",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libpng",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libz"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libfont",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libpng"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libui",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libfont"
+        },
+        {
+          "nome": "libxml"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libui",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore",
+          "versao": ">=2.0"
+        },
+        {
+          "nome": "libfont"
+        },
+        {
+          "nome": "libxml"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libnet",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libssl",
+          "versao": ">=1.0,<2.0"
+        },
+        {
+          "nome": "libz"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libnet",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libssl",
+          "versao": ">=2.0"
+        },
+        {
+          "nome": "libz"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libarchive",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libz"
+        },
+        {
+          "nome": "libxml"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "libdb",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "shell",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "terminal",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "shell"
+        },
+        {
+          "nome": "libui",
+          "versao": ">=1.0,<2.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "file-manager",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libui",
+          "versao": ">=1.0,<2.0"
+        },
+        {
+          "nome": "libarchive"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "text-editor",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libui",
+          "versao": ">=1.0,<2.0"
+        },
+        {
+          "nome": "libdb"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "browser",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libnet",
+          "versao": ">=1.0,<2.0"
+        },
+        {
+          "nome": "libui",
+          "versao": ">=1.0,<2.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "desktop-suite",
+      "versao": "1.0",
+      "descricao": "Metapacote de um ambiente gráfico fictício",
+      "depende": [
+        {
+          "nome": "terminal"
+        },
+        {
+          "nome": "file-manager"
+        },
+        {
+          "nome": "text-editor"
+        },
+        {
+          "nome": "browser"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "modern-browser",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libnet",
+          "versao": ">=2.0"
+        },
+        {
+          "nome": "libui",
+          "versao": ">=2.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "legacy-backup",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libssl",
+          "versao": "<2.0"
+        },
+        {
+          "nome": "libarchive"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "web-server",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libnet",
+          "versao": ">=1.0,<2.0"
+        }
+      ],
+      "conflita": [
+        {
+          "nome": "alternate-server"
+        }
+      ]
+    },
+    {
+      "nome": "alternate-server",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libnet",
+          "versao": ">=1.0,<2.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "broken-app",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "missing-plugin",
+          "versao": ">=1.0"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "cycle-alpha",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "cycle-beta"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "cycle-beta",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "cycle-gamma"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "cycle-gamma",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "cycle-alpha"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "compat-app",
+      "versao": "2.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "missing-sdk"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "compat-app",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libcore"
+        }
+      ],
+      "conflita": []
+    },
+    {
+      "nome": "protected-agent",
+      "versao": "1.0",
+      "descricao": "",
+      "depende": [
+        {
+          "nome": "libssl",
+          "versao": "<2.0"
+        }
+      ],
+      "conflita": []
+    }
+  ]
+}

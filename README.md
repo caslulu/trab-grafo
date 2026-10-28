@@ -1,8 +1,8 @@
-# Gestão de Conflitos em Sistemas de Dependência
+# DepGraph — Gestão de Conflitos em Sistemas de Dependência
 
 Trabalho prático de Grafos — **Tema 9**.
 
-O projeto propõe uma ferramenta para gerenciar dependências entre tarefas usando grafos dirigidos. O objetivo é identificar dependências circulares, visualizar as relações entre tarefas e simular sua execução em uma ordem que respeite todos os pré-requisitos.
+O DepGraph é um simulador de gerenciamento de pacotes inspirado no Linux. A partir de um pedido de instalação, um catálogo e um estado de pacotes já instalados, identifica dependências transitivas, seleciona versões compatíveis, detecta conflitos e calcula uma ordem segura de instalação.
 
 ## Integrantes
 
@@ -13,90 +13,30 @@ O projeto propõe uma ferramenta para gerenciar dependências entre tarefas usan
 - David
 - Joao Heleno
 
-## Status do projeto
+## Estado atual
 
-O projeto tem um **protótipo visual com NetworkX e Matplotlib**, criado para explorar a ideia e validar os fluxos da interface. A implementação acadêmica com estrutura de grafos e algoritmos próprios ainda está planejada.
+O protótipo visual usa **NetworkX e Matplotlib** e contém **27 pacotes com 32 versões** em um catálogo sintético. O exemplo principal instala um ambiente gráfico com **17 pacotes e 26 dependências**, preservando os dois pacotes inicialmente instalados.
 
-O protótipo fica em [`prototypes/networkx_preview/`](prototypes/networkx_preview/) e permite editar tarefas e dependências, visualizar ciclos e simular a execução passo a passo.
+A aplicação funciona em uma janela local e simula transações em memória. Os nomes, versões e relações são fictícios; nenhum comando Linux é executado.
 
-**Atenção ao escopo acadêmico:** o PDF permite bibliotecas prontas de grafos apenas para comparação de desempenho. Este protótipo exploratório usa NetworkX e não atende a essa restrição como implementação final; a versão entregue deverá usar implementação própria, salvo autorização do professor.
+O primeiro exemplo genérico de tarefas foi substituído por este foco em pacotes. Seu [registro histórico](docs/prototipo-networkx/tarefas-historico.md) foi preservado.
 
-## Objetivos
+## Funcionalidades do protótipo
 
-- Modelar tarefas e suas dependências por meio de um grafo dirigido.
-- Implementar uma estrutura própria de grafos e seus algoritmos.
-- Detectar ciclos e apresentar as tarefas envolvidas em um conflito.
-- Calcular uma ordenação topológica para grafos acíclicos.
-- Construir uma interface gráfica para visualizar o grafo e os resultados.
-- Simular a execução das tarefas respeitando suas dependências.
-- Avaliar a correção, a complexidade e o desempenho da solução.
+- Resolução de dependências diretas e transitivas.
+- Restrições de versão e seleção de uma versão por pacote.
+- Busca de versões alternativas por backtracking.
+- Diagnósticos separados para incompatibilidade de versões, conflitos declarados, dependências ausentes e ciclos.
+- Preservação das versões instaladas, com atualização explícita e verificação dos dependentes existentes.
+- Plano de instalação baseado em ordenação topológica.
+- Preparação passo a passo, com atualização do estado instalado ao concluir toda a transação simulada.
+- Análise dos dependentes afetados por uma remoção.
+- Inspeção de versões e relações clicando nos vértices.
+- Exportação de relatório JSON e imagens PNG.
 
-## Modelagem
+## Executar
 
-Cada **vértice** representa uma tarefa, e cada **aresta dirigida** representa uma dependência obrigatória.
-
-A convenção utilizada será: **`A → B` significa que B depende de A**. Assim, A precisa ser concluída antes de B.
-
-Exemplo de fluxo sem conflito:
-
-```mermaid
-graph LR
-    A[Preparar ambiente] --> B[Compilar]
-    B --> C[Testar]
-    C --> D[Empacotar]
-```
-
-Nesse exemplo, uma ordem válida é preparar o ambiente, compilar, testar e empacotar.
-
-Se uma dependência adicional fizer uma tarefa depender, direta ou indiretamente, dela mesma, haverá um ciclo. A ferramenta deverá indicar o conflito e bloquear a simulação até que as dependências sejam corrigidas.
-
-## Funcionalidades planejadas para a versão final
-
-- [ ] Cadastro, edição e remoção de tarefas.
-- [ ] Cadastro e remoção de dependências.
-- [ ] Importação e exportação de projetos em JSON.
-- [ ] Visualização do grafo com indicação da direção das dependências.
-- [ ] Detecção de ciclos com apresentação de um caminho que evidencie o conflito.
-- [ ] Ordenação topológica pelo algoritmo de Kahn.
-- [ ] Simulação sequencial da execução das tarefas.
-- [ ] Exibição dos estados e do histórico da simulação.
-- [ ] Testes automatizados e experimentos de desempenho.
-
-A execução prevista é uma simulação dos estados das tarefas, sem execução de comandos externos ou instalação de pacotes.
-
-## Algoritmos previstos
-
-| Algoritmo | Finalidade | Complexidade de tempo esperada |
-| --- | --- | --- |
-| Busca em profundidade (DFS) | Detectar e reconstruir um ciclo no grafo. | `O(V + E)` |
-| Kahn | Calcular uma ordenação topológica ou identificar a impossibilidade de uma ordem completa. | `O(V + E)` |
-
-`V` representa a quantidade de tarefas, e `E`, a quantidade de dependências. Essas complexidades consideram listas de adjacência e, no algoritmo de Kahn, uma fila FIFO.
-
-## Tecnologias propostas
-
-- **Python:** implementação da ferramenta e dos algoritmos.
-- **Tkinter e Canvas:** interface gráfica e desenho do grafo.
-- **JSON:** armazenamento dos projetos.
-- **unittest:** testes automatizados.
-- **Git:** versionamento e registro das contribuições individuais.
-- **LaTeX com template SBC:** elaboração do relatório técnico.
-
-A stack ainda poderá ser ajustada pelo grupo. Conforme o enunciado, a criação e o processamento do grafo devem ter implementação própria; bibliotecas prontas, como NetworkX, são permitidas apenas para comparação de desempenho.
-
-## Documentação disponível
-
-| Arquivo | Conteúdo |
-| --- | --- |
-| [TP.pdf](TP.pdf) | Enunciado oficial com temas, requisitos e regras de entrega. |
-| [agent.md](agent.md) | Guia detalhado com escopo, modelagem, arquitetura proposta, algoritmos, testes e planejamento. |
-| [README.md](README.md) | Apresentação inicial do projeto e da equipe. |
-| [Índice da documentação](docs/README.md) | Navegação pelos guias e artefatos do projeto. |
-| [Documentação do protótipo](docs/prototipo-networkx/README.md) | Guia de uso, arquitetura, galeria com seis cenários e reprodução das imagens. |
-
-## Executar o protótipo visual
-
-Requer **Python 3.9 ou superior**. Na raiz do repositório:
+Requer Python 3.9 ou superior. Na raiz:
 
 ```bash
 python3 -m venv .venv
@@ -105,48 +45,61 @@ python -m pip install -r prototypes/networkx_preview/requirements.txt
 python -m prototypes.networkx_preview
 ```
 
-A janela permite alternar entre um exemplo válido e outro com ciclo, adicionar e remover tarefas e dependências, avançar a simulação e salvar JSON e PNG em `outputs/prototipo-networkx/`.
-
-Para abrir diretamente o exemplo com conflito:
+Para demonstrar versões incompatíveis:
 
 ```bash
-python -m prototypes.networkx_preview --exemplo com_ciclo
+python -m prototypes.networkx_preview --cenario versoes
 ```
 
-Para gerar uma imagem sem abrir uma janela:
+Para planejar uma atualização explícita:
 
 ```bash
-python -m prototypes.networkx_preview --exportar outputs/grafo.png
+python -m prototypes.networkx_preview --pedidos "modern-browser, libcore>=2.0"
 ```
 
-Para executar os testes do protótipo:
+Para listar o catálogo ou exportar uma imagem sem abrir janela:
 
 ```bash
-MPLBACKEND=Agg python -m unittest prototypes.networkx_preview.test_preview -v
+python -m prototypes.networkx_preview --listar
+python -m prototypes.networkx_preview --cenario conflito --exportar outputs/conflito.png
 ```
 
-### Prévias
+## Visualização
 
-Interface completa do protótipo:
+![Plano de instalação do ambiente gráfico e suas dependências](docs/prototipo-networkx/imagens/pacotes-01-plano-instalacao.png)
 
-![Interface do protótipo com grafo, diagnóstico e controles](docs/prototipo-networkx/imagens/01-interface-inicial.png)
+![Conflito entre as versões exigidas de uma biblioteca compartilhada](docs/prototipo-networkx/imagens/pacotes-04-versoes-incompativeis.png)
 
-[Ver a galeria completa e a explicação dos cenários](docs/prototipo-networkx/README.md#4-interface-e-galeria-de-imagens).
+[Ver os dez cenários ilustrados e suas explicações](docs/prototipo-networkx/README.md#5-interface-e-galeria).
 
-Fluxo válido com tarefas organizadas por dependência:
+## Modelagem
 
-![Prévia do grafo sem ciclos](docs/prototipo-networkx/sem-ciclo.png)
+Cada vértice do plano representa um pacote com sua versão selecionada. A convenção **A → B** significa que **B depende de A**. A ordem topológica coloca bibliotecas e demais pré-requisitos antes dos aplicativos que os utilizam.
 
-Conflito com destaque do ciclo que bloqueia a execução:
+Conflitos de coexistência e restrições de versão são verificados separadamente. Um grafo sem ciclo ainda pode representar um pedido impossível por exigir versões incompatíveis da mesma biblioteca.
 
-![Prévia do grafo com ciclo](docs/prototipo-networkx/com-ciclo.png)
+O resolvedor faz backtracking sobre as versões disponíveis. Esse custo pode ser exponencial; a análise linear `O(V + E)` vale para a ordenação e a detecção de ciclos isoladamente, e não para toda a resolução.
 
-## Etapas e entregas
+## Documentação
 
-1. **Modelagem e planejamento:** definição do problema, levantamento de dados, modelagem do grafo, diagramas UML e plano de desenvolvimento.
-2. **Desenvolvimento:** implementação do grafo, algoritmos, interface gráfica, testes e avaliação de desempenho.
-3. **Relatório e apresentação:** relatório em LaTeX no template SBC, demonstração da ferramenta, slides e vídeo.
+| Documento | Conteúdo |
+| --- | --- |
+| [Índice de docs](docs/README.md) | Organização dos guias e artefatos. |
+| [Guia do protótipo](docs/prototipo-networkx/README.md) | Uso, modelagem, cenários, arquitetura, formato dos dados e limitações. |
+| [agent.md](agent.md) | Requisitos acadêmicos e planejamento da versão final com foco em pacotes. |
+| [TP.pdf](TP.pdf) | Enunciado original do professor. |
 
-O relatório deverá ter **12 a 15 páginas**. A apresentação presencial terá **10 minutos**, e o vídeo deverá ter **12 a 18 minutos**, com participação dos integrantes e explicação de suas contribuições.
+## Testes e reprodução das imagens
 
-A entrega inclui um arquivo `.zip` com o código-fonte da ferramenta, os fontes do relatório e o PDF final, além dos demais materiais exigidos. Cada integrante deverá realizar sua própria entrega no Canvas e confirmar ali o prazo e as instruções de envio.
+```bash
+MPLBACKEND=Agg python -m unittest prototypes.networkx_preview.test_packages prototypes.networkx_preview.test_preview -v
+python -m prototypes.networkx_preview.gerar_imagens
+```
+
+Há 29 testes entre a versão atual de pacotes e o exemplo histórico de tarefas. O gerador reproduz as dez imagens de pacotes presentes na documentação.
+
+## Entrega acadêmica
+
+O protótipo NetworkX é exploratório. O PDF restringe bibliotecas prontas de grafos a comparações de desempenho; a versão final deverá usar estrutura e processamento de grafos implementados pelo grupo, salvo autorização do professor.
+
+A entrega inclui modelagem com UML, código versionado com contribuições individuais, relatório de **12 a 15 páginas em LaTeX no template SBC**, slides, apresentação presencial de **10 minutos** e vídeo de **12 a 18 minutos**. Cada integrante deverá realizar sua própria entrega e confirmar no Canvas o prazo e o envio de todos os materiais.
