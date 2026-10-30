@@ -196,6 +196,10 @@ classDiagram
 
 Esse diagrama é uma proposta conceitual para a versão final. Ajustá-lo à implementação e produzir também casos de uso e sequência de planejamento/execução. Exportar figuras legíveis para o relatório.
 
+A [documentação inicial de modelagem](docs/modelagem/README.md) detalha requisitos e critérios de aceitação, casos de uso, classes do protótipo e da arquitetura proposta, componentes, sequências, estados e atividade de resolução. As vistas propostas deverão ser revisadas conforme a implementação final e não substituem o relatório SBC.
+
+O [conjunto principal de modelagens](docs/modelagem/modelagens-principais.md) inclui oito diagramas UML com fontes PlantUML, imagens PNG/SVG e geração local reproduzível. Essas figuras são a referência para o relatório, preservando a distinção entre funcionalidades atuais e arquitetura proposta. Não representam a migração para o núcleo próprio como concluída.
+
 ## 9. Dados e testes
 
 O catálogo atual é sintético e está em `prototypes/networkx_preview/examples/pacotes.json`. Não apresentá-lo como base real de Linux. Pesquisar bases externas adequadas, registrar fonte, licença e transformação e justificar o uso de dados sintéticos quando necessário.

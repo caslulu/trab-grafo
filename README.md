@@ -84,7 +84,10 @@ O resolvedor faz backtracking sobre as versões disponíveis. Esse custo pode se
 
 | Documento | Conteúdo |
 | --- | --- |
+| [Documentação completa](docs/modelagem/documentacao-completa.md) | Referência consolidada da aplicação, com requisitos, oito diagramas UML revisados, dados, algoritmos e validação. |
 | [Índice de docs](docs/README.md) | Organização dos guias e artefatos. |
+| [Modelagem e diagramas](docs/modelagem/README.md) | Requisitos, casos de uso, classes, arquitetura, sequências e estados da versão final proposta. |
+| [Principais modelagens UML](docs/modelagem/modelagens-principais.md) | Casos de uso, classes de domínio e núcleo, componentes, sequências, estados e atividade em figuras PNG/SVG. |
 | [Guia do protótipo](docs/prototipo-networkx/README.md) | Uso, modelagem, cenários, arquitetura, formato dos dados e limitações. |
 | [agent.md](agent.md) | Requisitos acadêmicos e planejamento da versão final com foco em pacotes. |
 | [TP.pdf](TP.pdf) | Enunciado original do professor. |

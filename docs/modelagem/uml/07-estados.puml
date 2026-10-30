@@ -1,0 +1,42 @@
+@startuml
+!include estilo.puml
+!pragma layout elk
+skinparam packageStyle rectangle
+skinparam packageTitleAlignment right
+hide empty description
+left to right direction
+title DepGraph — Ciclo de planejamento e transação (proposta)
+state SemPlano
+state Analisando
+state "Resultado da análise" as Resultado {
+state Bloqueada
+state Inconclusiva
+state Desatualizada
+state Falha
+state "Plano disponível" as Disponivel {
+    state Pronta
+    state Preparando
+    state Concluida
+    state ChecarProgresso <<choice>>
+    state ValidarFinal
+    Pronta --> ChecarProgresso : avançar [pré-requisitos OK\nou zero operações]\n/ preparar se houver
+    Preparando --> ChecarProgresso : avançar [pré-requisitos OK]\n/ preparar próximo
+    ChecarProgresso --> Preparando : [ainda há operações]
+    ChecarProgresso --> ValidarFinal : [não há operações pendentes]
+    ValidarFinal : entry / validar estado final completo
+    ValidarFinal --> Concluida : [estado válido] / confirmar na sessão
+    Concluida : avançar [pedido e estado confirmado\ninalterados] / informar conclusão
+}
+Disponivel --> Desatualizada : pedido ou estado\nesperado alterados
+Pronta --> Falha : avançar\n[pré-requisito falhou]
+Preparando --> Falha : avançar\n[pré-requisito falhou]
+ValidarFinal --> Falha : [estado inválido]\n/ preservar instalados
+}
+[*] --> SemPlano
+SemPlano --> Analisando : analisar\n[sintaxe válida]
+Analisando --> Pronta : solução encontrada
+Analisando --> Bloqueada : alternativas esgotadas
+Analisando --> Inconclusiva : limite atingido
+Analisando --> SemPlano : base inválida
+Resultado --> Analisando : analisar [sintaxe válida]\n/ descartar preparação anterior
+@enduml

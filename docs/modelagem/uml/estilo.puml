@@ -1,0 +1,26 @@
+' Configuração compartilhada; não é um diagrama independente.
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+<style>
+root {
+    Padding 6
+}
+</style>
+skinparam ArrowColor #334155
+skinparam roundcorner 8
+skinparam classAttributeIconSize 0
+skinparam classBackgroundColor #EFF6FF
+skinparam classBorderColor #3B5280
+skinparam componentBackgroundColor #EFF6FF
+skinparam componentBorderColor #3B5280
+skinparam usecaseBackgroundColor #EFF6FF
+skinparam usecaseBorderColor #3B5280
+skinparam stateBackgroundColor #EFF6FF
+skinparam stateBorderColor #3B5280
+skinparam activityBackgroundColor #EFF6FF
+skinparam activityBorderColor #3B5280
+skinparam noteBackgroundColor #FFF8DC
+skinparam noteBorderColor #9A7B24

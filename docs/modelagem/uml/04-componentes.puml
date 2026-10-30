@@ -1,0 +1,37 @@
+@startuml
+!include estilo.puml
+!pragma layout elk
+skinparam packageStyle rectangle
+top to bottom direction
+title DepGraph — Componentes (proposta)
+component "Interface gráfica\ne renderização" as UI
+component "Entrada e saída\nJSON / PNG" as IO
+package "Núcleo independente de interface" {
+    component "Sessão e transação" as S
+    component "Resolução de versões" as R
+    component "Catálogo e validação" as C
+    component "Análise de remoção" as M
+    component "Grafo próprio\nKahn / DFS / busca" as G
+    component "Objetos de domínio" as D
+}
+UI ..> S
+UI ..> IO
+IO ..> C
+IO ..> D
+S ..> R
+S ..> C
+S ..> M
+S ..> D
+R ..> C
+R ..> G
+R ..> D
+C ..> G
+C ..> D
+M ..> C
+M ..> G
+M ..> D
+note bottom of G
+  Sem NetworkX no funcionamento final,
+  inclusive no layout e desenho.
+end note
+@enduml

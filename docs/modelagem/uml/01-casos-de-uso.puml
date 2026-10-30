@@ -1,0 +1,27 @@
+@startuml
+!include estilo.puml
+left to right direction
+title DepGraph — Casos de uso
+actor "Usuário" as U
+rectangle "DepGraph — simulador local" {
+    usecase "UC01\nCarregar cenário" as UC01
+    usecase "UC02\nAnalisar instalação\nou atualização" as UC02
+    usecase "UC03\nInspecionar pacote\ne diagnóstico" as UC03
+    usecase "UC04\nAvançar transação\nsimulada" as UC04
+    usecase "UC05\nAnalisar impacto\nde remoção" as UC05
+    usecase "UC06\nExportar relatório\ne imagem" as UC06
+}
+U -- UC01
+U -- UC02
+U -- UC03
+U -- UC04
+U -- UC05
+U -- UC06
+note right of UC04
+  Requer plano válido e atual.
+  Não executa comandos Linux.
+end note
+note right of UC05
+  Consulta sem remoção efetiva.
+end note
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+!include estilo.puml
+!pragma layout elk
+title DepGraph — Classes do domínio (proposta)
+hide empty methods
+class Requisito {
+    +nome: str
+    +restricao: str
+    +aceita(versao: str): bool
+}
+class Pacote {
+    +nome: str
+    +versao: str
+    +descricao: str
+}
+class Catalogo {
+    +versoesPorNome: mapa
+    +consultar(nome: str): lista<Pacote>
+    +obter(nome: str, versao: str): Pacote
+    +validarEstado(instalados: mapa): void
+}
+class Plano {
+    +resultado: ResultadoPlano
+    +baseInstalada: mapa
+    +selecionados: mapa
+    +ordem: lista<str>
+    +operacoes: lista<str>
+    +tentativas: int
+}
+enum ResultadoPlano {
+    valido
+    bloqueado
+    inconclusivo
+}
+class Diagnostico {
+    +tipo: str
+    +mensagem: str
+    +vertices: lista<str>
+}
+class GrafoDependencias {
+    +sucessores: mapa
+    +predecessores: mapa
+}
+Catalogo --> "0..*" Pacote : versões disponíveis
+Pacote --> "0..*" Requisito : dependencias
+Pacote --> "0..*" Requisito : incompatibilidades
+Plano --> "1..*" Requisito : pedidos
+Plano --> "0..*" Pacote : versões selecionadas
+Plano --> "0..*" Diagnostico : diagnósticos
+Plano --> "1" GrafoDependencias : precedência
+Plano ..> ResultadoPlano
+note bottom of Plano
+  Instantâneo após análise: pedido e base preservados.
+  Uma versão por nome na seleção.
+  Falhas não disponibilizam operações executáveis.
+end note
+note bottom of GrafoDependencias
+  A → B: B depende de A.
+  Conflitos não são arestas de precedência.
+end note
+@enduml

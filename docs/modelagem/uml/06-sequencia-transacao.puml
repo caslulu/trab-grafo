@@ -1,0 +1,53 @@
+@startuml
+!include estilo.puml
+title DepGraph — Preparação e confirmação (proposta)
+actor Usuário as U
+boundary Interface as I
+control Sessao as S
+control Transacao as T
+entity Catalogo as C
+U -> I : Próximo pacote
+I -> S : avancar()
+alt Sem transação válida
+    S --> I : Bloquear; exigir análise
+else Transação disponível
+    S -> T : avancar(instalados, pedidosAtuais)
+    alt Concluída, pedido e estado confirmado inalterados
+        T --> S : Sem operações pendentes
+    else Pedido ou estado esperado alterados
+        T --> S : Desatualizada; exigir nova análise
+    else Plano atual e válido
+        opt Há operação pendente
+            T -> T : Verificar pré-requisitos no estado temporário
+        end
+        alt Pré-requisito não satisfeito
+            T --> S : Falha; não registrar preparação
+        else Pré-requisitos satisfeitos ou sem operações
+            opt Há operação pendente
+                T -> T : Registrar pacote preparado e histórico
+            end
+            alt Ainda há operações
+                T --> S : Progresso parcial; instalados preservados
+            else Todas preparadas ou nenhuma operação necessária
+                T -> T : validarFinal()
+                T -> C : validarEstado(estadoFinal)
+                alt Estado final inválido
+                    C --> T : Erro
+                    T --> S : Falha; confirmação bloqueada
+                else Estado final válido
+                    C --> T : Validação concluída
+                    T --> S : Estado final pronto
+                    S -> S : Aplicar estado final e marcar conclusão\nna transação; registrar novo estado esperado
+                end
+            end
+        end
+    end
+    S --> I : Resultado do avanço
+end
+I --> U : Progresso, conclusão ou diagnóstico
+note over S, T
+  Depois de concluída, a base antiga não deve causar
+  falso bloqueio: o estado confirmado é o estado esperado.
+  Falhas preservam o estado instalado.
+end note
+@enduml

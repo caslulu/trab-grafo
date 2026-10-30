@@ -1,0 +1,58 @@
+@startuml
+!include estilo.puml
+!pragma layout elk
+title DepGraph — Classes do núcleo (proposta)
+class Sessao {
+    +instalados: mapa
+    +pedidosAtuais: lista<Requisito>
+    +analisar(pedidos): Plano
+    +avancar(): resultado
+    +consultarRemocao(nome): resultado
+}
+class Transacao {
+    +estado: str
+    +preparados: lista<str>
+    +historico: lista<str>
+    +avancar(instalados, pedidosAtuais): resultado
+    +validarFinal(): mapa
+}
+class Resolvedor {
+    +planejar(pedidos, instalados, limite): Plano
+}
+class Catalogo {
+    +consultar(nome): lista<Pacote>
+    +obter(nome, versao): Pacote
+    +validarEstado(instalados): void
+}
+class GrafoDependencias {
+    +adicionarVertice(nome): void
+    +adicionarAresta(origem, destino): void
+    +ordenar(): lista<str>
+    +encontrarCiclo(): lista<str>
+    +dependentes(nome): conjunto<str>
+}
+class AnaliseRemocao {
+    +analisar(nome, instalados): resultado
+}
+class Plano
+Sessao --> "1" Resolvedor
+Sessao --> "1" Catalogo
+Sessao --> "1" AnaliseRemocao
+Sessao --> "0..1" Transacao : preparação atual
+Transacao --> "1" Plano
+Transacao --> "1" Catalogo : valida estado final
+Resolvedor --> "1" Catalogo
+Resolvedor ..> Plano : produz
+Resolvedor ..> GrafoDependencias
+Catalogo ..> GrafoDependencias
+AnaliseRemocao --> "1" Catalogo
+AnaliseRemocao ..> GrafoDependencias
+note bottom of Transacao
+  Preparação parcial preserva os instalados.
+  Sessao aplica o estado final somente após validação.
+  Pedido ou base alterados exigem nova análise.
+end note
+legend bottom
+  Arquitetura proposta; Plano e Catalogo detalhados na vista de domínio.
+endlegend
+@enduml

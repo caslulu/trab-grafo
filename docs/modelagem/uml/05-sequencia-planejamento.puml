@@ -1,0 +1,53 @@
+@startuml
+!include estilo.puml
+title DepGraph — Planejamento (proposta)
+actor Usuário as U
+boundary Interface as I
+control Sessao as S
+control Resolvedor as R
+entity Catalogo as C
+participant GrafoDependencias as G
+U -> I : Solicitar análise
+I -> S : analisar(pedidos)
+S -> S : Validar sintaxe
+alt Entrada inválida
+    S --> I : Erro; pedido editado não pode executar plano anterior
+else Entrada válida
+    S -> S : Descartar preparação anterior\ne copiar pedido e base
+    S -> R : planejar(pedidos, instalados, limite)
+    R -> C : validarEstado(instalados)
+    alt Estado inicial inválido
+        C --> R : Erro de validação
+        R --> S : Erro; sem plano executável
+    else Estado inicial válido
+        C --> R : Estado válido
+        loop Enquanto necessário, com alternativas e dentro do limite
+            R -> C : consultar(nome)
+            C --> R : Versões candidatas
+            R -> R : Escolher versão, expandir requisitos\ne verificar compatibilidade
+            opt Atribuição completa compatível
+                R -> G : Construir grafo e ordenar()
+                G --> R : Ordem ou ciclo detectado
+                opt Ciclo detectado
+                    R -> G : encontrarCiclo()
+                    G --> R : Caminho fechado
+                end
+            end
+            opt Ramo inválido e alternativas disponíveis
+                R -> R : Restaurar ponto de escolha\ne descartar dependências do ramo
+            end
+        end
+        R --> S : Plano válido, bloqueado ou inconclusivo
+        S -> S : Registrar plano
+        opt Resultado válido
+            S -> S : Criar transação executável
+        end
+    end
+    S --> I : Resultado ou erro de validação
+end
+I --> U : Apresentar plano, grafo ou diagnóstico
+note over S, R
+  A análise não altera o estado instalado.
+  Limite atingido não comprova impossibilidade.
+end note
+@enduml
